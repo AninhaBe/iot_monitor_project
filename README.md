@@ -62,7 +62,7 @@ Desenvolver uma solução de streaming que:
 
 ---
 
-## 📦 Estrutura de Pastas
+## Estrutura de Pastas
 
 iot_monitor_project/  
 ├── docker-compose.yml  
@@ -78,7 +78,7 @@ iot_monitor_project/
 
 ---
 
-## ▶️ Como executar
+## ▶Como executar
 
 1. Clonar o repositório:
 
@@ -102,7 +102,7 @@ docker-compose logs -f consumer
 
 ---
 
-## 🗃️ Exportar dados do banco
+## Exportar dados do banco
 
 Use o script incluído para exportar os dados para `.csv` e `.xlsx`:
 
@@ -117,7 +117,7 @@ Gera:
 
 ---
 
-## 📈 Exemplos de Dados
+## Exemplos de Dados
 
 ```json
 {
@@ -130,7 +130,7 @@ Gera:
 
 ---
 
-## 🔒 Segurança e Resiliência
+## Segurança e Resiliência
 
 - Containers com `restart: always` para tolerância a falhas  
 - Isolamento de dependências com Poetry  
@@ -138,7 +138,7 @@ Gera:
 
 ---
 
-## 📚 Possíveis Extensões
+## Possíveis Extensões
 
 - Adicionar Streamlit para visualizar gráficos em tempo real  
 - Incluir alertas (ex: se temperatura > 30°C)  
@@ -147,8 +147,7 @@ Gera:
 
 ---
 
-## 👤 Autor
+## Autor
 
-Desenvolvido por **Seu Nome**  
-Email: seu.email@exemplo.com  
-Licença: MIT
+Desenvolvido por **Ana Beatriz**  
+Email: contato.anabeatrizoliver@gmail.com  
