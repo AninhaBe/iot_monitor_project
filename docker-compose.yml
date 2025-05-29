@@ -19,31 +19,22 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
-
-  postgres:
-    image: postgres:13
     restart: always
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: sensores
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
 
   producer:
     build: ./producer
-    restart: always
     depends_on:
       - kafka
+    restart: always
+    env_file:
+      - .env
 
   consumer:
     build: ./consumer
-    restart: always
     depends_on:
       - kafka
-      - postgres
-
-volumes:
-  pgdata:
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./exports:/app/exports

@@ -1,153 +1,145 @@
-# Monitoramento de Sensores IoT (com Kafka + PostgreSQL + Docker)
+# IoT Sensor Monitoring System
 
-Este projeto simula um sistema de monitoramento de sensores IoT. Ele envia dados em tempo real via Kafka e armazena esses dados em um banco de dados para posterior análise.
-
----
-
-## Objetivo
-
-Desenvolver uma solução de streaming que:
-
-- Gere dados fictícios de sensores (temperatura e umidade)
-- Envie esses dados para um tópico Kafka usando um **Producer**
-- Consuma os dados desse tópico usando um **Consumer**
-- Armazene os dados recebidos em um banco de dados relacional (PostgreSQL)
+Este projeto é um sistema completo de **monitoramento de sensores IoT**, que simula o envio de dados em tempo real usando Kafka, armazena essas informações em um banco de dados PostgreSQL (Render) e disponibiliza os dados para análise.
 
 ---
 
-## Arquitetura
+## Visão Geral
+
+O sistema é dividido em **quatro partes principais**:
+
+1. **Producer**: Gera dados falsos de sensores (com a biblioteca `faker`) e envia para um tópico Kafka.
+2. **Kafka + Zookeeper**: Orquestram a comunicação entre producer e consumer.
+3. **Consumer**: Consome dados do tópico Kafka, processa e armazena no banco PostgreSQL.
+4. **Exportação CSV**: Os dados também são salvos em arquivos `.csv` diários em uma pasta `exports/`.
+
+---
+
+## Estrutura do Projeto
 
 ```
-+------------+          Kafka         +-------------+         PostgreSQL
-|  Producer  | ───────────────▶──────▶ |  Consumer   | ───────▶  sensores.db
-+------------+                       +-------------+          
-      ▲                                     ▲
-      |                                     |
-    faker                             kafka-python
+iot_monitor_project/
+│
+├── consumer/
+│   ├── app.py
+│   ├── pyproject.toml
+│   ├── Dockerfile
+│   └── wait-for-services.sh
+│
+├── producer/
+│   ├── app.py
+│   ├── pyproject.toml
+│   ├── Dockerfile
+│   └── wait-for-services.sh
+│
+├── exports/
+│   └── sensores_YYYY-MM-DD.csv  # Exportação local dos dados
+│
+├── docker-compose.yml
+├── .env
+└── README.md
 ```
-
-- O **Producer** usa a biblioteca `faker` para gerar dados aleatórios.
-- O **Consumer** consome do tópico Kafka e armazena no banco.
-- Tudo roda dentro de containers usando Docker Compose.
-
----
-
-## Lógica do Sistema
-
-- A cada 1 segundo, o `Producer` gera um novo dado com:
-  - sensor_id: UUID do sensor
-  - timestamp: Data e hora de leitura
-  - temperatura: valor entre 20.0°C e 30.0°C
-  - umidade: valor entre 30% e 80%
-
-- O dado é enviado para o tópico `iot_sensores`.
-
-- O `Consumer` consome as mensagens do tópico e:
-  - Cria a tabela `sensores` (caso não exista)
-  - Insere os dados no PostgreSQL com persistência
 
 ---
 
 ## Tecnologias Utilizadas
 
-| Componente      | Tecnologia              |
-|-----------------|--------------------------|
-| Linguagem       | Python 3.9               |
-| Mensageria      | Apache Kafka + Zookeeper |
-| Banco de Dados  | PostgreSQL 13            |
-| Geração de Dados| faker                    |
-| Conectores      | kafka-python, psycopg2   |
-| Containerização | Docker + Docker Compose  |
-| Gerenciador     | Poetry (pyproject.toml)  |
+- **Python 3.9**
+- **Kafka + Zookeeper (Confluent)**
+- **PostgreSQL 13 (Render)**
+- **Poetry** para dependências
+- **Faker** para simular sensores
+- **Docker & Docker Compose**
 
 ---
 
-## Estrutura de Pastas
+## Como Executar Localmente
 
-iot_monitor_project/  
-├── docker-compose.yml  
-├── producer/  
-│   ├── app.py  
-│   ├── Dockerfile  
-│   └── pyproject.toml  
-├── consumer/  
-│   ├── app.py  
-│   ├── Dockerfile  
-│   └── pyproject.toml  
-├── data_export.py  ← script de exportação para CSV/Excel  
+### 1. Pré-requisitos
 
----
+- Docker e Docker Compose instalados
+- Conta na [Render](https://render.com) com banco PostgreSQL configurado
 
-## ▶Como executar
+### 2. Clonar o projeto
 
-1. Clonar o repositório:
-
-```
-git clone <repo-url>
+```bash
+git clone https://github.com/seu-usuario/iot_monitor_project.git
 cd iot_monitor_project
 ```
 
-2. Subir os containers:
+### 3. Criar o `.env`
 
-```
-docker-compose up --build -d
+Crie um arquivo `.env` com o seguinte conteúdo:
+
+```env
+DB_NAME=sensores_vncw
+DB_USER=user
+DB_PASSWORD=sua_senha_aqui
+DB_HOST=seu_host.render.com
+DB_PORT=5432
+
+KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+KAFKA_TOPIC=sensores
+EXPORT_FOLDER=exports
 ```
 
-3. Ver logs (opcional):
+> Aqui são dados simulados, substitua os dados com os fornecidos pela Render
 
+---
+
+### 4. Subir os containers
+
+```bash
+docker-compose up --build
 ```
-docker-compose logs -f producer
-docker-compose logs -f consumer
+
+Isso vai iniciar:
+- Kafka
+- Zookeeper
+- Producer (simulando sensores)
+- Consumer (armazenando e exportando dados)
+
+---
+
+## Como visualizar os dados
+
+1. Acesse o banco via **DBeaver** (ou pgAdmin):
+   - Use os dados da Render (host, user, db, password)
+   - A tabela se chama `sensores`
+
+2. Execute:
+
+```sql
+SELECT * FROM sensores ORDER BY timestamp DESC LIMIT 10;
+```
+
+3. Veja os arquivos `.csv` sendo criados em `/exports/`.
+
+---
+
+## Para parar tudo
+
+```bash
+docker-compose down
 ```
 
 ---
 
-## Exportar dados do banco
+## Observações
 
-Use o script incluído para exportar os dados para `.csv` e `.xlsx`:
-
-```
-python data_export.py
-```
-
-Gera:
-
-- sensores_exportado.csv  
-- sensores_exportado.xlsx
+- Os dados são fictícios (temperatura, umidade, sensor_id)
+- Os containers são reiniciáveis e independentes
+- O banco local (`postgres`) foi removido em favor da nuvem (Render)
 
 ---
 
-## Exemplos de Dados
-
-```json
-{
-  "sensor_id": "123e4567-e89b-12d3-a456-426614174000",
-  "timestamp": "2025-05-29T00:12:34",
-  "temperatura": 27.6,
-  "umidade": 52.3
-}
-```
-
----
-
-## Segurança e Resiliência
-
-- Containers com `restart: always` para tolerância a falhas  
-- Isolamento de dependências com Poetry  
-- Banco persistente com volume Docker
-
----
-
-## Possíveis Extensões
-
-- Adicionar Streamlit para visualizar gráficos em tempo real  
-- Incluir alertas (ex: se temperatura > 30°C)  
-- Salvar históricos diários em arquivos  
-- Migrar Kafka para serviço em nuvem (MSK, Confluent Cloud, etc)
-
----
-
-## Autor
+## Dev
 
 Desenvolvido por **Ana Beatriz**  
-Email: contato.anabeatrizoliver@gmail.com  
+contato.anabeatrizoliver@gmail.com
+
+---
+
+## Licença
+
+MIT

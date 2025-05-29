@@ -1,14 +1,14 @@
 FROM python:3.9
 
-RUN curl -sSL https://install.python-poetry.org | python3 -
-ENV PATH="/root/.local/bin:$PATH"
-
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock* ./
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi --no-root
+COPY . .
 
-COPY app.py .
+RUN apt-get update && apt-get install -y netcat-openbsd && \
+    pip install poetry && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-root
 
-CMD ["python", "app.py"]
+RUN chmod +x wait-for-services.sh
+
+CMD ["./wait-for-services.sh", "python", "app.py"]
