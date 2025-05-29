@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "producer"
+version = "0.1.0"
+description = "Serviço que gera dados simulados de sensores IoT e envia para Kafka"
+authors = ["Ana Bê <contato.anabeatrizoliver@gmail.com"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+faker = "^25.2.0"
+kafka-python = "^2.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
