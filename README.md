@@ -50,7 +50,6 @@ iot_monitor_project/
          +-----------+                     +-----------+         +----------------+
                                                                   |   Render.com   |
                                                                   +----------------+
-
              ▲                                  ▲
              |                                  |
            faker                   kafka-python + CSV export
