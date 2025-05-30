@@ -42,6 +42,22 @@ iot_monitor_project/
 
 ---
 
+## Arquitetura
+
+```
+         +-----------+        Kafka         +-----------+         +----------------+
+         | Producer  |  ----------------->  | Consumer  |  ----->  | PostgreSQL (☁️)|
+         +-----------+                     +-----------+         +----------------+
+                                                                  |   Render.com   |
+                                                                  +----------------+
+
+             ▲                                  ▲
+             |                                  |
+           faker                   kafka-python + CSV export
+```
+
+---
+
 ## Tecnologias Utilizadas
 
 - **Python 3.9**
